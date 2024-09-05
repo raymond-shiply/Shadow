@@ -35,6 +35,7 @@ public abstract class ImplLoader {
     }
 
     public String[] loadWhiteList(InstalledApk installedApk, String whiteListClassName, String whiteListFieldName) {
+        installedApk.setApkFileReadOnlyForSDK34AndAbove("ImpLoader#loadWhiteList");
         DexClassLoader dexClassLoader = new DexClassLoader(
                 installedApk.apkFilePath,
                 installedApk.oDexPath,

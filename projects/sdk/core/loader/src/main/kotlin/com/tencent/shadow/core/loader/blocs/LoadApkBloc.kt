@@ -46,6 +46,7 @@ object LoadApkBloc {
         loadParameters: LoadParameters,
         pluginPartsMap: MutableMap<String, PluginParts>
     ): PluginClassLoader {
+        installedApk.setApkFileReadOnlyForSDK34AndAbove("LoadApkBloc#loadPlugin")
         val apk = File(installedApk.apkFilePath)
         val odexDir = if (installedApk.oDexPath == null) null else File(installedApk.oDexPath)
         val dependsOn = loadParameters.dependsOn

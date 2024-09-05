@@ -123,10 +123,12 @@ public interface PluginManifest {
 
     final class ReceiverInfo extends ComponentInfo {
         public final String[] actions;
+        public final boolean exported;
 
-        public ReceiverInfo(String className, String[] actions) {
+        public ReceiverInfo(String className, String[] actions, boolean exported) {
             super(className);
             this.actions = actions;
+            this.exported = exported;
         }
     }
 

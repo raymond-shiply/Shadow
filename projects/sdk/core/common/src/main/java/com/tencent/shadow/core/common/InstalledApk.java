@@ -18,13 +18,17 @@
 
 package com.tencent.shadow.core.common;
 
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import java.io.File;
 
 /**
  * 安装完成的apk
  */
 public class InstalledApk implements Parcelable {
+
+    private static final Logger logger = LoggerFactory.getLogger(InstalledApk.class);
 
     public final String apkFilePath;
 
@@ -57,6 +61,20 @@ public class InstalledApk implements Parcelable {
         }
         if (parcelExtras != null) {
             in.readByteArray(parcelExtras);
+        }
+    }
+
+    public void setApkFileReadOnlyForSDK34AndAbove(String caller) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(caller + "setApkFileReadOnlyForSDK34AndAbove  apkFilePath = " + apkFilePath);
+        }
+        // 适配 API 34， https://developer.android.com/about/versions/14/behavior-changes-14?hl=zh-cn#kotlin
+        if (Build.VERSION.SDK_INT >= 34) {
+            File apkFile = new File(apkFilePath);
+            boolean result = apkFile.setReadOnly();
+            if (logger.isDebugEnabled()) {
+                logger.debug(caller + "setApkFileReadOnlyForSDK34AndAbove  result = " + result);
+            }
         }
     }
 

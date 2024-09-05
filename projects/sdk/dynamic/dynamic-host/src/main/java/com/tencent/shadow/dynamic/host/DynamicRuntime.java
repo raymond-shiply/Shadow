@@ -118,6 +118,7 @@ public class DynamicRuntime {
 
 
     private static void hackParentToRuntime(InstalledApk installedRuntimeApk, ClassLoader contextClassLoader) throws Exception {
+        installedRuntimeApk.setApkFileReadOnlyForSDK34AndAbove("DynamicRuntime#hackParentToRuntime");
         RuntimeClassLoader runtimeClassLoader = new RuntimeClassLoader(installedRuntimeApk.apkFilePath, installedRuntimeApk.oDexPath,
                 installedRuntimeApk.libraryPath, contextClassLoader.getParent());
         hackParentClassLoader(contextClassLoader, runtimeClassLoader);

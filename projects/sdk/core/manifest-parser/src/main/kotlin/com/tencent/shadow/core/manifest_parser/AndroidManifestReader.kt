@@ -131,7 +131,7 @@ class AndroidManifestReader {
         if (receiverActions.isNotEmpty()) {
             receiverMap[AndroidManifestKeys.action] = receiverActions
         }
-
+        receiverMap.putAttributeIfNotNull(element, AndroidManifestKeys.exported)
         return receiverMap
     }
 

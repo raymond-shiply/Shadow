@@ -233,9 +233,13 @@ private class PluginManifestBuilder(
                 postfix = "\"}"
             ) ?: "null"
 
+        val exportedValue = componentMap[AndroidManifestKeys.exported] as String?
+        val exportedLiteral = exportedValue?.toBoolean() ?: false
+
         return "new com.tencent.shadow.core.runtime.PluginManifest" +
                 ".ReceiverInfo(\"${componentMap[AndroidManifestKeys.name]}\", " +
-                actionsLiteral +
+                actionsLiteral + ", " +
+                exportedLiteral +
                 ")"
     }
 

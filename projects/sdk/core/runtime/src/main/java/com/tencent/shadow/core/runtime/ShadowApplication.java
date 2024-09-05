@@ -28,9 +28,12 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Build;
+import android.util.Log;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -39,9 +42,12 @@ import java.util.WeakHashMap;
  */
 public class ShadowApplication extends ShadowContext {
 
+    private static final int CONTEXT_RECEIVER_EXPORTED = 2;
+    private static final int CONTEXT_RECEIVER_NOT_EXPORTED = 4;
+
     private Application mHostApplication;
 
-    private Map<String, String[]> mBroadcasts;
+    private List<PluginManifest.ReceiverInfo> mBroadcasts;
 
     private ShadowAppComponentFactory mAppComponentFactory;
 
@@ -89,21 +95,27 @@ public class ShadowApplication extends ShadowContext {
 
         isCallOnCreate = true;
 
-        for (Map.Entry<String, String[]> entry : mBroadcasts.entrySet()) {
+        for (PluginManifest.ReceiverInfo receiverInfo : mBroadcasts) {
             try {
-                String receiverClassname = entry.getKey();
+                String receiverClassname = receiverInfo.className;
                 Class<?> clazz = mPluginClassLoader.loadClass(receiverClassname);
                 BroadcastReceiver receiver = ((BroadcastReceiver) clazz.newInstance());
                 mAppComponentFactory.instantiateReceiver(mPluginClassLoader, receiverClassname, null);
 
                 IntentFilter intentFilter = new IntentFilter();
-                String[] receiverActions = entry.getValue();
+                String[] receiverActions = receiverInfo.actions;
                 if (receiverActions != null) {
                     for (String action : receiverActions) {
                         intentFilter.addAction(action);
                     }
                 }
-                registerReceiver(receiver, intentFilter);
+                // 适配 targetSDK 34, https://developer.android.com/about/versions/14/behavior-changes-14?hl=zh-cn
+                if (Build.VERSION.SDK_INT >= 34) {
+                    int flag = receiverInfo.exported ? CONTEXT_RECEIVER_EXPORTED : CONTEXT_RECEIVER_NOT_EXPORTED;
+                    registerReceiver(receiver, intentFilter, flag);
+                } else {
+                    registerReceiver(receiver, intentFilter);
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -173,13 +185,13 @@ public class ShadowApplication extends ShadowContext {
     }
 
     public void setBroadcasts(PluginManifest.ReceiverInfo[] receiverInfos) {
-        Map<String, String[]> classNameToActions = new HashMap<>();
+        List<PluginManifest.ReceiverInfo> receiverInfoList = new ArrayList<>();
         if (receiverInfos != null) {
             for (PluginManifest.ReceiverInfo receiverInfo : receiverInfos) {
-                classNameToActions.put(receiverInfo.className, receiverInfo.actions);
+                receiverInfoList.add(receiverInfo);
             }
         }
-        mBroadcasts = classNameToActions;
+        mBroadcasts = receiverInfoList;
     }
 
     public void attachBaseContext(Context base) {
