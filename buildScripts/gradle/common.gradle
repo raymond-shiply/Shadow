@@ -16,7 +16,9 @@ allprojects {
     if ("${System.env.CI}".equalsIgnoreCase("true")) {
         ext.VERSION_NAME = System.getenv("GITHUB_REF_SLUG")
     } else {
-        ext.VERSION_NAME = "local"
+        ext.VERSION_NAME = "2.3.0.1.1"
+//        ext.VERSION_NAME = "local03-from2.3.0-SNAPSHOT"
+//        ext.VERSION_NAME = "local03-from2.3.0"
     }
 
     if ("${System.env.PUBLISH_RELEASE}".equalsIgnoreCase("true")) {
@@ -26,7 +28,8 @@ allprojects {
     } else {
         ext.VERSION_SUFFIX = "-${gitShortRev()}-SNAPSHOT"
     }
-    ext.ARTIFACT_VERSION = ext.VERSION_NAME + ext.VERSION_SUFFIX
+//    ext.ARTIFACT_VERSION = ext.VERSION_NAME + ext.VERSION_SUFFIX
+    ext.ARTIFACT_VERSION = ext.VERSION_NAME
     ext.TEST_HOST_APP_APPLICATION_ID = 'com.tencent.shadow.test.hostapp'
     ext.SAMPLE_HOST_APP_APPLICATION_ID = 'com.tencent.shadow.sample.host'
     repositories {

@@ -430,36 +430,65 @@ publishing {
         }
     }
     repositories {
-        def useLocalCredential = false
-        Properties properties = new Properties()
-        def propertiesFile = project.rootProject.file('local.properties')
-        if (propertiesFile.exists()) {
-            properties.load(propertiesFile.newDataInputStream())
+//        def useLocalCredential = false
+//        Properties properties = new Properties()
+//        def propertiesFile = project.rootProject.file('local.properties')
+//        if (propertiesFile.exists()) {
+//            properties.load(propertiesFile.newDataInputStream())
+//
+//            if ("${properties.getProperty('gpr.local')}".equalsIgnoreCase('true')) {
+//                def user = properties.getProperty('gpr.user')
+//                def key = properties.getProperty('gpr.key')
+//                maven {
+//                    name = "GitHubPackages"
+//                    credentials {
+//                        username = user
+//                        password = key
+//                    }
+//                    url "https://maven.pkg.github.com/${user}/shadow"
+//                }
+//
+//                useLocalCredential = true
+//            }
+//        }
+//
+//        if (!useLocalCredential && "${System.env.CI}".equalsIgnoreCase("true")) {
+//            maven {
+//                name = "GitHubPackages"
+//                credentials {
+//                    username = System.getenv("GITHUB_ACTOR")
+//                    password = System.getenv("GITHUB_TOKEN")
+//                }
+//                url "https://maven.pkg.github.com/" + "${System.env.GITHUB_REPOSITORY}".toLowerCase()
+//            }
+//        } else {
+//            mavenLocal()
+//        }
 
-            if ("${properties.getProperty('gpr.local')}".equalsIgnoreCase('true')) {
-                def user = properties.getProperty('gpr.user')
-                def key = properties.getProperty('gpr.key')
-                maven {
-                    name = "GitHubPackages"
-                    credentials {
-                        username = user
-                        password = key
-                    }
-                    url "https://maven.pkg.github.com/${user}/shadow"
+        def publishToRemoteMaven = true
+        if (publishToRemoteMaven) {
+            def username = System.getenv("TencentMirrors_username")
+            def password = System.getenv("TencentMirrors_password")
+            if (!username?.trim() || !password?.trim()) {
+                Properties properties = new Properties()
+                try {
+                    InputStream inputStream = rootProject.file('local.properties').newDataInputStream()
+                    properties.load(inputStream)
+                } catch (ignored) {
                 }
-
-                useLocalCredential = true
+                username = properties.getProperty("username")
+                password = properties.getProperty("password")
             }
-        }
 
-        if (!useLocalCredential && "${System.env.CI}".equalsIgnoreCase("true")) {
             maven {
-                name = "GitHubPackages"
+                name = 'RaftShadow'
                 credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
+                    setUsername(username)
+                    setPassword(password)
                 }
-                url "https://maven.pkg.github.com/" + "${System.env.GITHUB_REPOSITORY}".toLowerCase()
+                url publicationVersion.endsWith('-SNAPSHOT') ?
+                        'https://mirrors.tencent.com/repository/maven/RaftShadow-snapshots' :
+                        'https://mirrors.tencent.com/repository/maven/RaftShadow'
             }
         } else {
             mavenLocal()

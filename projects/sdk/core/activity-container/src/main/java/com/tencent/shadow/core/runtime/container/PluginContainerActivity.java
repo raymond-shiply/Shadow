@@ -111,9 +111,10 @@ public class PluginContainerActivity extends GeneratedPluginContainerActivity im
         Bundle bundle;
         bundle = savedInstanceState == null ? extras : savedInstanceState;
         try {
-            String loaderVersion = bundle.getString(LOADER_VERSION_KEY);
+//            String loaderVersion = bundle.getString(LOADER_VERSION_KEY);
             long processVersion = bundle.getLong(PROCESS_ID_KEY);
-            return !BuildConfig.VERSION_NAME.equals(loaderVersion) || processVersion != DelegateProviderHolder.sCustomPid;
+//            return !BuildConfig.VERSION_NAME.equals(loaderVersion) || processVersion != DelegateProviderHolder.sCustomPid;
+            return processVersion != DelegateProviderHolder.sCustomPid;
         } catch (Throwable ignored) {
             //捕获可能的非法Intent中包含我们根本反序列化不了的数据
             return true;
